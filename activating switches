@@ -1,0 +1,51 @@
+### switch 1 ###
+#include <avr/io.h>
+#include <util/delay.h>
+int main (void)  //main function
+{
+	//Initialize pb0 as an output
+	//_delay_ms(1000)
+	DDRB |= 0b00000001;
+	DDRD |= 0b00000000;//setting port D as input ie PD3
+	PORTD = 0b11111111; // activate pull up resistor
+    while(1)
+	{
+		if(PIND&(1<<PIND3))
+		{
+			PORTB = 0b00000000;
+		}
+		else 
+		// &= 0b00000000)//d3
+		{
+			PORTB = 0b00000001;
+		}
+		
+	}
+}
+
+### switch 2 ###
+
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main (void)  //main function
+{
+	//Initialize pb0 as an output
+	//_delay_ms(1000)
+	DDRB |= 0b00000010;//PB1
+	DDRD |= 0b00000000;//setting port D as input ie PD3
+	PORTD = 0b11111111; // activate pull up resistor
+	while(1)
+	{
+		if(PIND&(1<<PIND0))
+		{
+			PORTB = 0b00000000;
+		}
+		else
+		// &= 0b00000000)//d3
+		{
+			PORTB = 0b00000010;
+		}
+		
+	}
+}
