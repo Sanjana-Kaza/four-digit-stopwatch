@@ -1,0 +1,422 @@
+
+
+#include <avr/io.h>
+#include <util/delay.h>
+#define F_CPU 1000000
+#define SS DDB2
+#define MOSI DDB3
+#define MISO DDB4
+#define SCK DDB5
+ 
+void transmit(uint8_t i)
+{
+ 
+   	
+   	
+   	SPDR = i;
+   	while(!(SPSR & ( 1<< SPIF)))//waiting for transmission to be complete
+   	{
+   	
+   	
+   	PORTB |= (1<<SS);//make SS high
+   	
+   	_delay_ms(2);
+ 
+   	PORTB &=~(1<<SS);//make SS low
+   	_delay_ms(2);
+ 
+ 
+}
+void write(void)
+{
+ 
+ 
+   	DDRC |= 0xff;
+   	DDRD |= 0xff;
+ 
+ 
+   	DDRB |= (1<<MOSI) | (1<<SS) | (1<<SCK);//making them outputs
+ 
+   	SPCR |=(1<<MSTR);//enable master SPI
+ 
+   	
+   	SPCR |=(0<<SPI2X);//Divide clock frequency by 2
+ 
+   	SPCR |= ( 1<< SPE);//enable SPI
+ 
+}
+ 
+ 
+void segment(int digit, int count,int dp)
+{
+   	uint8_t i;
+   	if (digit ==4)//activates D1 and turns off D3,D0 and C4 for digit 4
+   	{
+          	PORTD |= (1<< PORTD1);
+          	PORTD &= ~(1<<PORTD3);
+          	PORTD &= ~(1<<PORTD0);
+          	PORTC &= ~(1<<PORTC4);
+   	}
+   	else if(digit ==3)//activates D3 and turns off D1,D0 and C4 for digit 3
+   	{
+          	PORTD &= ~(1<< PORTD1);
+          	PORTD |= (1<<PORTD3);
+          	PORTD &= ~(1<<PORTD0);
+          	PORTC &= ~(1<<PORTC4);
+   	}
+   	else if (digit == 2)//activates D0 and turns off D1,D3 and C4 for digit 2
+   	{
+          	PORTD &= ~(1<< PORTD1);
+          	PORTD &= ~(1<<PORTD3);
+          	PORTD |= (1<<PORTD0);
+          	PORTC &=~ (1<<PORTC4);
+   	}
+   	else if (digit ==1)//activates C4 and turns off D1,D3 and D0 for digit 1
+   	{
+          	PORTD &= ~(1<< PORTD1);
+          	PORTD &= ~(1<<PORTD3);
+          	PORTD &= ~(1<<PORTD0);
+          	PORTC |= (1<<PORTC4);
+   	}
+   	
+   	
+   	if ( dp == 0)//Condition for decimal point 0
+   	{
+          	
+          	if ( count == 0)
+          	{
+                 	i = 0b00111111;//segments that are transmitted when count is 0
+          	   	transmit(i);
+          	}
+ 
+          	if ( count ==1)
+          	{
+                 	i = 0b00000110;//segments that are transmitted when count is 1
+          	   	transmit(i);
+          	}
+ 
+          	if ( count ==2)
+          	{
+                 	i = 0b01011011;//segments that are transmitted when count is 2
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==3)
+          	{
+                 	i = 0b01001111;//segments that are transmitted when count is 3
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==4)
+          	{
+                 	i = 0b01100110;//segments that are transmitted when count is 4
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==5)
+          	{
+                 	i = 0b01101101;//segments that are transmitted when count is 5
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==6)
+          	{
+                 	i = 0b01111101;//segments that are transmitted when count is 6
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==7)
+          	{
+                 	i = 0b00000111;//segments that are transmitted when count is 7
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==8)
+          	{
+                 	i = 0b01111111;//segments that are transmitted when count is 8
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==9)
+          	{
+                 	i = 0b01100111;//segments that are transmitted when count is 9
+          	   	transmit(i);
+ 
+ 
+          	}
+   	}
+   	else//Otherwise
+   	{
+          	if ( count == 0)
+          	{
+                 	i = 0b10111111;//segments that are transmitted when count is 0
+          	   	transmit(i);
+          	}
+ 
+          	if ( count ==1)
+          	{
+                 	i = 0b10000110;//segments that are transmitted when count is 1
+          	   	transmit(i);
+          	}
+ 
+          	if ( count ==2)
+          	{
+                 	i = 0b11011011;//segments that are transmitted when count is 2
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==3)
+          	{
+                 	i = 0b11001111;//segments that are transmitted when count is 3
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==4)
+          	{
+                 	i = 0b11100110;//segments that are transmitted when count is 4
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==5)
+          	{
+                 	i = 0b11101101;//segments that are transmitted when count is 5
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==6)
+          	{
+                 	i = 0b11111101;//segments that are transmitted when count is 6
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==7)
+          	{
+                 	i = 0b10000111;//segments that are transmitted when count is 7
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==8)
+          	{
+                 	i = 0b11111111;//segments that are transmitted when count is 8
+          	   	transmit(i);
+ 
+          	}
+ 
+          	if ( count ==9)
+          	{
+                 	i = 0b11100111;//segments that are transmitted when count is 9
+          	   	transmit(i);
+ 
+ 
+          	}
+   	}
+ 
+   	
+   	
+   	
+}
+ 
+int main(void)
+{
+   	int a = 0;//start at 0
+  	write();//initializing the registers
+   	int max = 10;//set maximum value as 10
+   	TCCR1B |= ( 1<< CS11) ;	// setting prescalar to 64
+   	OCR1A = 250;  // Output compare register compares register and timer  value for 2ms
+   	int flag =0;
+   	TCNT1 = 0;//timer initialization
+   	PORTD = 0b11111111; // activate pull up resistor
+   	int tos=0; int s =0; int ts =0;//initialize 10th of seconds,seconds and 10 seconds
+   	int m=0;//initialize minutes
+   	DDRD &= ~(1<<PIND4);// setting d4 as input
+   	DDRD &= ~(1<<PIND2);// setting d2 as input
+   	
+ 
+   	while(1)
+   	{
+          	PORTD &= ~(1<< PORTD1);//turning off all the common cathodes ports ie digits
+          	PORTD &= ~(1<<PORTD3);
+          	PORTD &= ~(1<<PORTD0);
+          	PORTC &= ~(1<<PORTC4);
+          	
+          	while((PIND &(1<<PIND4)) && flag ==1)//checking if the button is not pressed but has been pressed before
+          	{
+          	   	while((TIFR1 & (1<<OCF1A)) == 0){}//wait till we get 2 ms delay
+          	 if(ts>0){segment(1,tos,1);}//when ts>0 pass tos through segment function
+          	 	else{segment(1,tos,0);}
+          	   	TCNT1=0;
+                 	TIFR1 |= (1<<OCR1A);
+                 	
+          	   	while((TIFR1 & (1<<OCF1A)) == 0){}//wait till we get 2 ms delay
+          	 if(ts>0){segment(2,s,1);}//when ts>0 pass s through segment function
+          	   	else{segment(2,s,0);}
+          	   	TCNT1=0;//reset timer
+                 	TIFR1 |= (1<<OCR1A);//clear alert
+                 	
+          	   	while((TIFR1 & (1<<OCF1A)) == 0){}//wait till we get 2 ms delay
+          	 if(ts>0){segment(3,ts,1);}//when ts>0 pass ts through segment function
+          	  	else{segment(3,ts,0);}
+          	   	TCNT1=0;//reset timer
+                 	TIFR1 |= (1<<OCR1A);//clear alert
+                 	
+          	   	while((TIFR1 & (1<<OCF1A)) == 0){}//wait till we get 100 ms delay
+          	 if(ts>0){segment(4,m,1);}//when ts>0 pass m through segment function
+          	   	else{segment(4,m,0);}
+          	   	TCNT1=0;//reset timer
+                 	TIFR1 |= (1<<OCR1A);//clear alert
+          	
+          	}
+          	flag =0;
+          	
+          	if((PIND &(1<<PIND4))==0 && flag ==0)  //checking if the button has been pressed for the first time
+          	{
+                 	
+          	   	while(1){
+                       	
+                 	   	if ((PIND &(1<<PIND4))) // checking if the button is not pressed
+                 	   	{
+                       	   	flag =1; // changing the status to pressed once
+                 	   	}
+                 	   	if ((PIND &(1<<PIND4))==0 && (flag ==1))  // checking if the button has been pressed for the second time
+                 	   	{
+                       	   	while((PIND &(1<<PIND4))==0 && (flag ==1))
+                       	   	
+                       	   	{                                          // freezing all the digits
+                       	          	while((TIFR1 & (1<<OCF1A)) == 0){}   //wait till we get 2 ms delay
+                       	   	 if(ts>0){segment(1,tos,1);}//when ts>0 pass m through segment function
+                       	   	 	else{segment(1,tos,0);}
+                       	   	   	TCNT1=0;//reset timer
+                       	          	TIFR1 |= (1<<OCR1A);//clear alert
+                       	          	
+                       	          	while((TIFR1 & (1<<OCF1A)) == 0){} //wait till we get 2 ms delay
+                       	   	 if(ts>0){segment(2,s,1);}//when ts>0 pass m through segment function
+                       	   	   	else{segment(2,s,0);}
+                       	   	   	TCNT1=0;//reset timer
+                       	          	TIFR1 |= (1<<OCR1A);//clear alert
+                       	          	
+                       	          	while((TIFR1 & (1<<OCF1A)) == 0){} //wait till we get 2 ms delay
+                       	   	 if(ts>0){segment(3,ts,1);}//when ts>0 pass ts through segment function
+                       	   	  	else{segment(3,ts,0);}
+                       	   	   	TCNT1=0;//reset timer
+                       	          	TIFR1 |= (1<<OCR1A);//clear alert
+                       	          	
+                       	          	while((TIFR1 & (1<<OCF1A)) == 0){}//wait till we get 2 ms delay
+                       	   	 if(ts>0){segment(4,m,1);}//when ts>0 pass m through segment function
+                       	   	   	else{segment(4,m,0);}
+                       	   	   	TCNT1=0;//reset timer
+                       	          	TIFR1 |= (1<<OCR1A);//clear alert
+                       	   	}
+                       	   	break; // breaking out of freezing the digits
+                       	   	
+                 	   	}
+                       	
+                 	   	if (tos == max)//when tos is max,reset it 0 and increment seconds
+                 	   	{
+                       	   	tos = 0;
+                       	   	s++;
+                 	   	}
+                 	   	if ( s==max)//when s is max,reset it 0 and increment ts
+                 	   	{
+                       	   	ts++;
+                       	   	s=0;
+                 	   	}
+                 	   	if( ts == 6)//when ts is max,reset it 0 and increment minutes
+                 	   	{
+                       	   	m++;
+                       	   	ts =0;
+                 	   	}
+                 	   	if((PIND &(1<<PIND2))==0 )  // checking if the reset button is pressed
+                 	   	{
+                       	   	tos=0;  s =0;  ts =0;  // making all digits zero
+                       	   	m=0;
+                 	   	}
+                       	
+                 	   	while((TIFR1 & (1<<OCF1A)) == 0){}//wait till we get 2 ms delay   // normal functioning of the clock
+                 	 if(ts>0){segment(1,tos,1);}//when ts>0 pass tos through segment function
+                 	 	else{segment(1,tos,0);}
+                 	   	a++;
+                 	   	TCNT1=0;//clear timer
+                 	   	TIFR1 |= (1<<OCR1A);//clear alert
+                       	
+                 	   	if(a==100)
+                 	   	{
+                       	   	a=0;
+                       	   	tos++;
+                 	   	}
+ 
+                 	   	while((TIFR1 & (1<<OCF1A)) == 0){}//wait till we get 2 ms delay
+                 	 if(ts>0){segment(2,s,1);}//when ts>0 pass s through segment function
+                 	   	else{segment(2,s,0);}
+                 	   	a++;
+                 	   	TCNT1=0;//clear timer
+                 	   	TIFR1 |= (1<<OCR1A);//clear alert
+                       	
+                       	
+                 	   	if(a==100)
+                 	   	{
+                       	   	a=0;
+                       	   	tos++;
+                 	   	}
+ 
+                 	   	while((TIFR1 & (1<<OCF1A)) == 0){}//wait till we get 2 ms delay
+                 	 if(ts>0){segment(3,ts,1);}//when ts>0 pass ts through segment function
+                 	  	else{segment(3,ts,0);}
+                 	   	a++;
+                 	   	TCNT1=0;//clear timer
+                 	   	TIFR1 |= (1<<OCR1A);//clear alert
+ 
+                 	   	if(a==100)
+                 	   	{
+                       	   	a=0;
+                       	   	tos++;
+                 	   	}
+ 
+                 	   	while((TIFR1 & (1<<OCF1A)) == 0){}//wait till we get 2 ms delay
+                 	   	if (ts>0){segment(4,m,1);}//when ts>0 pass m through segment function
+                 	   	else{segment(4,m,0);}
+                 	   	a++;
+                 	   	TCNT1=0;//clear timer
+                 	   	TIFR1 |= (1<<OCR1A);//clear alert
+ 
+                 	   	if(a==100)
+                 	   	{
+                       	   	a=0;
+                       	   	tos++;
+                 	   	}
+                       	
+                 	}
+                 	
+          	}
+          	
+   	}
+   	
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                    	
+ 
+    
+ 
+ 
+ 
+
